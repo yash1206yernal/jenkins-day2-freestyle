@@ -2,17 +2,22 @@ pipeline {
     agent any
 
     stages {
-        stage('Checkout') {
+        stage('Build') {
             steps {
-                echo 'Code checkout handled by Jenkins'
+                sh 'chmod +x app.sh'
+                sh './app.sh'
             }
         }
 
-        stage('Build') {
+        stage('Code Quality') {
             steps {
-                echo 'Running build stage'
-                sh 'chmod +x app.sh'
-                sh './app.sh'
+                withSonarQubeEnv('LocalSonar') {
+                    sh """
+                      sonar-scanner \
+                      -Dsonar.projectKey=day4-jenkins \
+                      -Dsonar.sources=.
+                    """
+                }
             }
         }
     }
