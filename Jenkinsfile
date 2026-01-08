@@ -3,24 +3,35 @@ pipeline {
 
     stages {
 
-        stage('Build') {
+        stage('Checkout') {
             steps {
-                sh 'chmod +x app.sh'
-                sh './app.sh'
+                checkout scm
             }
         }
 
-       stage('Code Quality') {
-    steps {
-        script {
-            def scannerHome = tool 'SonarQubeScanner'
-            withSonarQubeEnv('LocalSonar') {
-                sh """
-                  ${scannerHome}/bin/sonar-scanner \
-                  -Dsonar.projectKey=day4-jenkins \
-                  -Dsonar.sources=.
-                """
+        stage('Build') {
+            steps {
+                sh '''
+                  chmod +x app.sh
+                  ./app.sh
+                '''
             }
         }
+
+        stage('Code Quality') {
+            steps {
+                script {
+                    def scannerHome = tool 'SonarQubeScanner'
+                    withSonarQubeEnv('LocalSonar') {
+                        sh """
+                          ${scannerHome}/bin/sonar-scanner \
+                          -Dsonar.projectKey=day4-jenkins \
+                          -Dsonar.sources=.
+                        """
+                    }
+                }
+            }
+        }
+
     }
 }
