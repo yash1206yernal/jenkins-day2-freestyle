@@ -10,20 +10,17 @@ pipeline {
             }
         }
 
-        stage('Code Quality') {
-            steps {
-                script {
-                    def scannerHome = tool 'sonar-scanner'
-                    withSonarQubeEnv('LocalSonar') {
-                        sh """
-                          ${scannerHome}/bin/sonar-scanner \
-                          -Dsonar.projectKey=day4-jenkins \
-                          -Dsonar.sources=.
-                        """
-                    }
-                }
+       stage('Code Quality') {
+    steps {
+        script {
+            def scannerHome = tool 'SonarQubeScanner'
+            withSonarQubeEnv('LocalSonar') {
+                sh """
+                  ${scannerHome}/bin/sonar-scanner \
+                  -Dsonar.projectKey=day4-jenkins \
+                  -Dsonar.sources=.
+                """
             }
         }
-
     }
 }
