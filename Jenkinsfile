@@ -2,74 +2,45 @@ pipeline {
     agent any
 
     environment {
-        APP_NAME = "day5-jenkins-credentials"
+        GIT_CREDS = credentials('github-creds')
     }
 
     stages {
 
-        stage('Checkout Code') {
+        stage('Checkout Private Repo') {
             steps {
-                echo "Checking out source code from GitHub"
-                git branch: 'main',
-                    url: 'https://github.com/yash1206yernal/jenkins-day2-freestyle.git'
+                sh '''
+                    echo "Cloning private repo using environment credentials"
+                    git clone https://${GIT_CREDS_USR}:${GIT_CREDS_PSW}@github.com/yash1206yernal/private-repo.git
+                '''
+            }
+        }
+
+        stage('Verify Code') {
+            steps {
+                sh '''
+                    echo "Files inside repo:"
+                    ls -l private-repo
+                '''
             }
         }
 
         stage('Build') {
             steps {
                 sh '''
-                    echo "Starting build..."
-                    chmod +x app.sh
-                    ./app.sh
+                    echo "Simulating build step"
+                    echo "Build successful"
                 '''
-            }
-        }
-
-        stage('Use Secret Text Credential') {
-            steps {
-                withCredentials([
-                    string(
-                        credentialsId: 'sample-secret',
-                        variable: 'MY_SECRET'
-                    )
-                ]) {
-                    sh '''
-                        echo "Secret injected securely"
-                        echo "Secret length: ${#MY_SECRET}"
-                    '''
-                }
-            }
-        }
-
-        stage('Use Username & Password Credential') {
-            steps {
-                withCredentials([
-                    usernamePassword(
-                        credentialsId: 'github-creds',
-                        usernameVariable: 'GIT_USER',
-                        passwordVariable: 'GIT_PASS'
-                    )
-                ]) {
-                    sh '''
-                        echo "GitHub username is injected"
-                        echo "Username length: ${#GIT_USER}"
-                        echo "Password is masked automatically"
-                    '''
-                }
             }
         }
     }
 
     post {
         success {
-            echo "✅ DAY 5 pipeline executed successfully"
+            echo "✅ Day 5 – Part 5 completed successfully"
         }
         failure {
-            echo "❌ DAY 5 pipeline failed"
-        }
-        always {
-            echo "🧹 Cleaning workspace"
-            cleanWs()
+            echo "❌ Build failed"
         }
     }
 }
