@@ -7,11 +7,11 @@ pipeline {
 
     stages {
 
-        stage('Checkout Private Repo') {
+        stage('Checkout Repo') {
             steps {
                 sh '''
-                    echo "Cloning private repo using environment credentials"
-                    git clone https://${GIT_CREDS_USR}:${GIT_CREDS_PSW}@github.com/yash1206yernal/private-repo.git
+                    echo "Cloning repository using secure credentials"
+                    git clone https://${GIT_CREDS_USR}:${GIT_CREDS_PSW}@github.com/yash1206yernal/jenkins-day2-freestyle.git
                 '''
             }
         }
@@ -19,8 +19,8 @@ pipeline {
         stage('Verify Code') {
             steps {
                 sh '''
-                    echo "Files inside repo:"
-                    ls -l private-repo
+                    echo "Listing files:"
+                    ls -l jenkins-day2-freestyle
                 '''
             }
         }
@@ -28,8 +28,9 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''
-                    echo "Simulating build step"
-                    echo "Build successful"
+                    cd jenkins-day2-freestyle
+                    chmod +x app.sh
+                    ./app.sh
                 '''
             }
         }
@@ -41,6 +42,9 @@ pipeline {
         }
         failure {
             echo "❌ Build failed"
+        }
+        always {
+            cleanWs()
         }
     }
 }
